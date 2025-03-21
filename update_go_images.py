@@ -7,18 +7,21 @@ def update_files(folder_path):
         print(f"Error: Folder '{folder_path}' not found!")
         return
 
+    # Uploadpedia pattern to exclude specific formats
+    uploadpedia_pattern = r"img/(?:cache/\d+/)?[a-zA-Z0-9]+/\d{4}/\d{1,2}/\d{1,2}/"
+
     # Patterns for identifying different URLs
-    image_pattern = r"https://(?:images|ecs7)\.tokopedia\.net/([^\s]+\.(?:png|jpg))"
-    file_pattern = r"https://assets\.tokopedia\.net/([^\s]+\.(?:csv|svg|pdf|xls|json|txt|xml|zip|mp4|webp))"
+    image_pattern = rf"https://(?:images|ecs7)\.tokopedia\.net/(?!{uploadpedia_pattern})[^\s]+\.(?:png|jpg)"
+    file_pattern = rf"https://assets\.tokopedia\.net/(?!{uploadpedia_pattern})[^\s]+\.(?:csv|svg|pdf|xls|json|txt|xml|zip|mp4|webp)"
 
     # Function to update image URLs
     def replace_image_url(match):
-        extracted_path = match.group(1)
+        extracted_path = match.group(0).split("tokopedia.net/")[1]
         return f"https://p16-images-comn-sg.tokopedia-static.net/tos-alisg-i-zr7vqa5nfb-sg/{extracted_path}~tplv-zr7vqa5nfb-image.image"
 
     # Function to update file URLs (add prefix)
     def replace_file_url(match):
-        extracted_path = match.group(1)
+        extracted_path = match.group(0).split("tokopedia.net/")[1]
         return f"https://p16-assets-sg.tokopedia-static.net/tos-alisg-i-cqp9s0kcd0-sg/{extracted_path}"
 
     # Walk through all files in the folder and subfolders
@@ -49,7 +52,7 @@ def update_files(folder_path):
 if len(sys.argv) > 1:
     folder_path = sys.argv[1]
 else:
-    folder_path = "/Users/bytedance/Documents/my_project"
+    folder_path = input("Enter the folder path: ").strip()
 
 # Run the function
 update_files(folder_path)
